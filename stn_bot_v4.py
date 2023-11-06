@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 #from requests_html import AsyncHTMLSessio
-#
+
 import time
 from selenium import webdriver
 from webdriver_manager.firefox import GeckoDriverManager
