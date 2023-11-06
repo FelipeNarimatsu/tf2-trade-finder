@@ -1,38 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 from requests_html import HTMLSession
-#from requests_html import AsyncHTMLSessio
-#
+#from requests_html import AsyncHTMLSessio 
 import time
 from selenium import webdriver
 from webdriver_manager.firefox import GeckoDriverManager
 
-url = ""
-
-print("Which type of item will i search?")
-print("1- Items")
-print("2- Hats")
-print("3- Stranges")
-print("4- Weapons")
-print("5- Vintages")
-print("6- Genuines")
-seletor = int(input())
-if(seletor == 1):
-    url = "https://stntrading.eu/tf2"
-if(seletor == 2):
-    url = "https://stntrading.eu/tf2/hats"
-if(seletor == 3):
-    url = "https://stntrading.eu/tf2/stranges"
-if(seletor == 4):
-    url = "https://stntrading.eu/tf2/weapons"
-if(seletor == 5):
-    url = "https://stntrading.eu/tf2/vintages"
-if(seletor == 6):
-    url = "https://stntrading.eu/tf2/genuines"
-
 browser = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-print(url)
-browser.get(str(url))
+
+browser.get("https://stntrading.eu/tf2")
 
 #rola a pagina até o final para carregar todo o conteudo
 
@@ -133,9 +109,6 @@ print(dados)
 
 #iteracao que joga os dados do array de armazenamento no tf2 backpack
 for x in range(int(quantia_itens_site)):
-    #filtro de coisa que nao presta olhar o preco
-    if("Strange Australium" in dados[x][0]):
-        break
 
     #se for um item unique
     if(dados[x][3] == "Unique"):
@@ -202,7 +175,7 @@ for x in range(int(quantia_itens_site)):
         html_pesquisa = html_pesquisa.format(nome_com_caractere_especial) 
 
 
-    #print(html_pesquisa)
+    print(html_pesquisa)
     #inicia a pesquisa do preco no tf2 backpack
     html_pesquisa = requests.get(html_pesquisa)
     html_pesquisa = html_pesquisa.text
@@ -221,104 +194,7 @@ for x in range(int(quantia_itens_site)):
     lista_precos_acc.append(dados[x][0])
     lista_precos_acc.append(dados[x][1])
     lista_precos_acc.append(preco_pesquisa)
-    #lista_precos.append(lista_precos_acc)
+    lista_precos.append(lista_precos_acc)
     
-    
-    #separa o preco do item num valor numerico e joga na lista_preco
-
-    #separa o preco de compra
-    #preco_compra[0] == key
-    #preco_compra[1] == ref
-    preco_compra_lista = []
-    preco_compra = str(lista_precos_acc[1])
-    #se o preco de compra tiver um valor em key e ref
-    if("," in preco_compra):
-        #print("ENTROU AQUI")
-        preco_compra = preco_compra.split(",")
-        preco_compra[0] = preco_compra[0].replace(" ", "") #remove os espacos
-        preco_compra[0] = preco_compra[0].replace("keys", "") #remove os escritos keys
-        preco_compra[0] = preco_compra[0].replace("key", "") #remove os escritos key
-        preco_compra_lista.append(preco_compra[0])
-
-        preco_compra[1] = preco_compra[1].replace(" ", "") #remove os espacos
-        preco_compra[1] = preco_compra[1].replace("ref", "") #remove os escritos ref
-        preco_compra_lista.append(preco_compra[1])
-
-    else:
-        if("keys" in preco_compra or "key" in preco_compra):
-            preco_compra_acc = preco_compra.replace(" ", "")    #remove os espacos
-            preco_compra_acc = preco_compra_acc.replace("keys", "")    #remove os escritos keys
-            preco_compra_acc = preco_compra_acc.replace("key", "")    #remove os escritos key
-            preco_compra_lista.append(preco_compra_acc)
-            preco_compra_lista.append("0")
-        else:
-
-            preco_compra_acc = preco_compra.replace(" ", "")    #remove os espacos
-            preco_compra_acc = preco_compra_acc.replace("ref", "")    #remove os escritos ref
-            preco_compra_lista.append("0")
-            preco_compra_lista.append(preco_compra_acc)
-
-    #print(preco_compra_lista)
-
-    #separa o preco de venda
-    #preco_venda[0] == key
-    #preco_venda[1] == ref
-    preco_venda_lista = []
-    preco_venda = str(lista_precos_acc[2])
-    #se o preco de venda tiver um valor em key e ref
-    if("," in preco_venda):
-        preco_venda = preco_venda.split(",")
-        preco_venda[0] = preco_venda[0].replace(" ", "") #remove os espacos
-        preco_venda[0] = preco_venda[0].replace("keys", "") #remove os escritos keys
-        preco_venda[0] = preco_venda[0].replace("key", "") #remove os escritos key
-        preco_venda_lista.append(preco_venda[0])
-
-        preco_venda[1] = preco_venda[1].replace(" ", "") #remove os espacos
-        preco_venda[1] = preco_venda[1].replace("ref", "") #remove os escritos ref
-        preco_venda_lista.append(preco_venda[1])
-    else:
-        if("keys" in preco_venda or "key" in preco_venda):
-            preco_venda_acc = preco_venda.replace(" ", "")    #remove os espacos
-            preco_venda_acc = preco_venda_acc.replace("keys", "")    #remove os escritos keys
-            preco_venda_acc = preco_venda_acc.replace("key", "")    #remove os escritos key
-            preco_venda_lista.append(preco_venda_acc)
-            preco_venda_lista.append("0")
-        else:
-            preco_venda_acc = preco_venda.replace(" ", "")    #remove os espacos
-            preco_venda_acc = preco_venda_acc.replace("ref", "")    #remove os escritos ref
-            preco_venda_lista.append("0")
-            preco_venda_lista.append(preco_venda_acc)
-
-    #print(preco_venda_lista)
-
-    #se for lucro
-    #print("=====")
-    #print(int(preco_venda_lista[0]))
-    #print(int(preco_compra_lista[0]))
-    #print(int(preco_venda_lista[0]) > int(preco_compra_lista[0]))
-
-    #print(float(preco_venda_lista[1]))
-    #print(float(preco_compra_lista[1]))
-    #print(float(preco_venda_lista[1]) > float(preco_compra_lista[1]))
-    #print("=====")
-    if(int(preco_venda_lista[0]) > int(preco_compra_lista[0])):
-        lista_precos_acc.append("LUCRO")
-    else:
-        if(int(preco_venda_lista[0]) == int(preco_compra_lista[0])):
-            if(float(preco_venda_lista[1]) > float(preco_compra_lista[1])):
-                lista_precos_acc.append("LUCRO")
-            else:
-                lista_precos_acc.append("PREJUIZO")
-        else:
-           lista_precos_acc.append("PREJUIZO") 
-
-    #se nao for lucro
-    #lista_precos_acc.append("PREJUIZO")
-    if(lista_precos_acc[3] == "LUCRO"):
-        print(lista_precos_acc)
-        print('\n')
-
-    preco_compra_lista = []
-    preco_venda_lista = []
-    lista_precos_acc = []               
-    #lista_preco.append()
+    print(lista_precos_acc)
+    lista_precos_acc = []            
