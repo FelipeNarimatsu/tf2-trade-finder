@@ -58,10 +58,18 @@ def main():
     headers_backpack = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0', 
             'Cookie': 'user-id=6i5byn3m71b4cd3hjog8;'}
 
-
     f1 = open('items_names.txt', 'r')  
-    f2 = open('urls.txt', 'a')
+    f2 = open('urls.txt', 'a+')
     item_names_list = f1.readlines()
+
+    #retrieve key infomation backpack.tf HTML
+    url_backpack_key = 'https://backpack.tf/stats/Unique/Mann%20Co.%20Supply%20Crate%20Key/Tradable/Craftable'
+    k = requests.get(url_backpack_key, headers=headers_backpack)
+    html_backpack_key = k.text
+    key_price = html_backpack_key.split('<div class="value">',1)[1]
+    key_price = key_price.split('â€',1)[0]
+    key_price = key_price.replace('\n','')
+    key_price = key_price.replace(' ','')
 
     for line in item_names_list:
         #generate URLs and remove \n from the end
