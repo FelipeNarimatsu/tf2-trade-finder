@@ -29,7 +29,7 @@ if(seletor == 5):
 if(seletor == 6):
     url = "https://stntrading.eu/tf2/genuines"
 
-browser = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+browser = webdriver.Firefox()
 print(url)
 browser.get(str(url))
 
