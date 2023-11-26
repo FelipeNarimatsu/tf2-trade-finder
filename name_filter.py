@@ -12,6 +12,8 @@ first_line_jump = True
 for line in full_text:
     if(first_line_jump != True):
         item_name = line.split('</span>',1)[0]
+        # if("#" in item_name):
+        #    break
         print(item_name)
         f2.write(item_name+'\n')
     first_line_jump = False

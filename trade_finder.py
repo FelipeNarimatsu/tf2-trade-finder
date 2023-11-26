@@ -7,6 +7,20 @@
 import sys, os
 import requests
 
+#only key price = 'x keys'
+def convert_only_key_price_to_ref(price_string, key_price):
+    price_keys = float(price_string.split(' key',1)[0])
+    price_ref = price_keys*float(key_price)
+    return price_ref
+
+#mixed price = 'x keys, x ref'
+def convert_mixed_price_to_ref(price_string, key_price):
+    price_ref = price_string.split(', ',1)[1]
+    price_ref = float(price_ref.split(' ',1)[0])
+    price_keys = float(price_string.split(' key',1)[0])
+    price_ref = price_ref + price_keys*float(key_price)
+    return price_ref
+
 def switch_item_type(item_name):
     if('Strange Part' in item_name):
         return 'Strange Part'
@@ -92,9 +106,14 @@ def main():
         sell_price_string = sell_price_string.split('</b></p><p class="text-success"><b>',1)[0]
         
         #remove text before item name and after item name on backpack HTML to retrieve buy price
-        if('<span>Latest Forum Threads</span>' not in full_html_backpack):
-            buy_price_string = full_html_backpack.split('<h4>Buy Orders</h4>',1)[1]
-            buy_price_string = buy_price_string.split('Suggestions',1)[0]
+        if("<span>Latest Forum Threads</span>" not in full_html_backpack):
+            try:
+                buy_price_string = full_html_backpack.split('<h4>Buy Orders</h4>',1)[1]
+                buy_price_string = buy_price_string.split('Suggestions',1)[0]
+            except IndexError:
+                #create buy_price_string that dont pass on next check
+                buy_price_string = 'No listings found.'
+                print("Index Error <h4>")
             if('No listings found.' not in buy_price_string):
                 buy_price_string = buy_price_string.split('data-listing_price="',1)[1]
                 buy_price_string = buy_price_string.split('" data-equipped="',1)[0]
@@ -105,7 +124,51 @@ def main():
 
         #filter out of stock items
         if("<b>0</b> in Stock" not in full_html_stn):
-            print('Item name: ' + line.replace('\n','') + '\t\t' + 'sell: ' + sell_price_string + '\t\t' + 'Buy: ' + buy_price_string)
+            #print(sell_price_string)
+            #print(buy_price_string)
+            #convert sell price to only ref
+            if(sell_price_string != ''):
+                if('key' not in sell_price_string):
+                    #print('already ref sell')
+                    sell_price_ref = float(sell_price_string.split('ref',1)[0])
+                    
+                elif('keys,' in sell_price_string or 'key,' in sell_price_string):
+                    #print('mixed sell')
+                    sell_price_ref = convert_mixed_price_to_ref(sell_price_string, key_price)
+                    
+                else:
+                    #print('only key sell')
+                    sell_price_ref = convert_only_key_price_to_ref(sell_price_string, key_price)
+                    
+            else:
+                sell_price_ref = 0
+
+            #convert buy price to only ref
+            if(buy_price_string != ''):
+                if('key' not in buy_price_string):
+                    #print('already ref buy')
+                    buy_price_ref = float(buy_price_string.split('ref',1)[0])
+                    #conversion_type = 'already ref'
+                elif('keys,' in buy_price_string or 'key,' in buy_price_string):
+                    #print('mixed buy')
+                    buy_price_ref = convert_mixed_price_to_ref(buy_price_string, key_price)
+                    #conversion_type = 'mixed'
+                else:
+                    #print('already ref buy')
+                    buy_price_ref = convert_only_key_price_to_ref(buy_price_string, key_price)
+                    #conversion_type = 'only key'
+            else:
+                buy_price_ref = 0
+
+            #calculate estimated profit in ref
+            if(buy_price_ref > sell_price_ref):
+                profit = buy_price_ref - sell_price_ref
+            else:
+                profit = 0
+            
+
+            #print('Item name: ' + line.replace('\n','') + '\t' + 'sell: ' + sell_price_string + '\t' + 'Buy: ' + buy_price_string + '\t' + 'Profit: ' + str(profit) + ' ' + conversion_type)
+            print('Profit: ' + str(profit) + ' Item name: ' + line.replace('\n','') + '\t' + 'sell: ' + str(sell_price_ref) + '\t' + 'Buy: ' + str(buy_price_ref) + '\t')
 
 
 #end main
