@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  mysql-url: mysql-service
+  MYSQL_HOST: '172.17.0.1'
+  MYSQL_USER: root
+  MYSQL_PASS: root
+  MYSQL_DATABASE: db
+  MYSQL_PORT: '3306'

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: tf2-trade-finder_mysql:latest
+        imagePullPolicy: Never
+        env:
+        - name: MYSQL_DATABASE
+          value: 'db'
+        - name: MYSQL_ROOT_PASSWORD
+          value: 'root'
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        # - name: var-lib
+        #   mountPath: ./mysql/data:/var/lib/mysql
+        # - name: entry-point
+        #   mountPath: ./mysql/init:/docker-entrypoint-initdb.d/:ro
+      volumes:
+      # - name: var-lib
+      # - name: entry-point
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mysql
+# spec:
+#   ports:
+#   - port: 3306
+#   selector:
+#     app: mysql
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 3306
+  selector:
+    app: mysql

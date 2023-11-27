@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "trade-finder-deployment"
+  labels:
+    app: "app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "app"
+  template:
+    metadata:
+      labels:
+        app: "app"
+    spec:
+      containers:
+        - name: "app"
+          image: tf2-trade-finder_trade_finder:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3306
+          env:
+            - name: PS-DATABASE-URL
+              valueFrom:
+                configMapKeyRef: 
+                  name: mysql-config
+                  key: mysql-url
+          # envFrom:
+          #   - configMapRef:
+          #       name: mysql-config
+          resources:
+            limits:
+              memory: 250Mi
+            requests:
+              cpu: 200m
+              memory: 200Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "app-service"
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: "app"
+  type: LoadBalancer
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+spec:
+  type: ExternalName
+  externalName: localhost
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: mysql-sql
+subsets:
+  -
+    addresses:
+      -
+        ip: "172.17.0.1"
+    ports:
+      -
+        port: 3306
+        name: "mysql-db"
+--- 
