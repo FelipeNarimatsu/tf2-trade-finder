@@ -1,0 +1,41 @@
+services:
+
+  mysql:
+    #container_name: trades_db
+    build: ./mysql/
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_ROOT_PASSWORD: 'root'
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d/:ro
+    ports:
+      - '3306:3306'
+    # networks:
+    #   - network
+    
+  trade_finder:
+    build: ./trade_finder/
+    #command: sh -c "sleep 3s ; python3 ./trade_finder.py"
+    links:
+      - "mysql"
+    depends_on:
+      - mysql
+    # networks:
+    #   - network
+
+  trade_api:
+      build: ./fastapi/
+      #command: sh -c "sleep 3s ; python3 ./trade_finder.py"
+      links:
+        - "mysql"
+      depends_on:
+        - mysql
+      # networks:
+      #   - network
+
+# networks:
+#   # Declare our private network.  We must declare one for the magic
+#   # Docker DNS to work, but otherwise its default settings are fine.
+#   network: {}

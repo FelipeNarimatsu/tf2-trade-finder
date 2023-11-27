@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trade-api
+  labels:
+    app: trade-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trade-api
+  template:
+    metadata:
+      labels:
+        app: trade-api
+    spec:
+      containers:
+      - name: trade-api
+        image: tf2-trade-finder_trade_api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        env:
+          - name: MYSQL_HOST
+            valueFrom:
+              configMapKeyRef: 
+                name: mysql-config
+                key: mysql-url
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-config
+                key: MYSQL_PASS
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-config
+                key: MYSQL_DATABASE
+          - name: MYSQL_USER
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-config
+                key: mysql_user                  
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-config
+                key: MYSQL_PASS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-api-service
+spec:
+  type: NodePort
+  #clusterIP: 10.96.75.104
+  selector:
+    app: trade-api
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30100
+
+# ---
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: trade-api-service-external
+# spec:
+#   type: ExternalName
+#   externalName: localhost
+# ---
