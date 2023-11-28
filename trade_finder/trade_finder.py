@@ -1,4 +1,3 @@
-#Developed by Felipe Narimatsu Presti
 #Trade finder program
     #hard coded items name of STN trade database
     #search items data using requests for retrieve STN HTML
